@@ -264,7 +264,7 @@ table {
     text-align: center;
     min-width: 280px;
     width:100vw;
-    max-width: 600px;
+    max-width: 400px;
     margin-top: 15px;
     margin-bottom: 15px;
     border-top: 1px solid black;
@@ -275,6 +275,7 @@ table {
 @media (min-width: 600px) {
     #inputTable {
         font-size:1em;
+        max-width: 600px;
     }
 }
 
