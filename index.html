@@ -5,7 +5,7 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     </head>
@@ -15,7 +15,7 @@
         </div>
 
         <div id="introDiv">
-            <span id="siteNameText">Colliding Scopes [TEST]</span>
+            <span id="siteNameText">Colliding Scopes</span>
             <span id="subtitleText">Turn photos into kaleidoscope animations</span>
         </div>
 
@@ -34,8 +34,9 @@
                     <td>
                         <pre><span class="tableText">Animation Speed</span><br><input class="input-number-noSpinners" type="range" id="speedInput" value="4" min="1" max="10"></pre>
                     </td>
+                    <td><button id="recordVideoButton">Record Video (r)</button></td>
                     <td><button id="pauseAnimationButton">Pause/Play (p)</button></td>
-                    <td><button id="save-image-button">Screenshot Image (s)</button></td>
+                    <td><button id="save-image-button">Screenshot (s)</button></td>
                 </tr>
 
             </table>
@@ -60,13 +61,13 @@
                 
                 <a href="https://www.buymeacoffee.com/stereoDrift" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png" alt="Buy Me A Coffee"></a>
 
-                <p>Enormous thanks to Luke Hannam, whose <a href="https://www.pepperoni.blog/canvas-kaleidoscope/" target="_blank" rel="noopener">blog post</a> explained the code and mechanics for creating kaleidoscope animations in javascript.</p>
+                <p>Enormous thanks and credits to Luke Hannam, whose <a href="https://www.pepperoni.blog/canvas-kaleidoscope/" target="_blank" rel="noopener">blog post</a> explained the code and mechanics for creating kaleidoscope animations in javascript.</p>
                 <p>I made only a few tweaks to Luke's original algorithm, and then added the front-end user interface which allowed users to upload their own photos, and to control variables like animation speed.</p>
-                <p>A few tips for using this tool:</p>
+                <p>There are a few hotkeys which can speed up using the tool:</p>
                 <ul>
+                    <li>Press <b>"r"</b> to start recording a video of the animation. Press "r" again to stop the recording. An mp4 video file will be exported afterwards</li>
                     <li>Press <b>"p"</b> to pause / play the animation. This lets you stop at an interesting point of the animation</li>
                     <li>Press <b>"s"</b> to save a screenshot of the current state of the animation</li>
-                    <li>To save the animation as a video or gif file, I suggest using free tools like OBS studio or ScreenToGif. Both of those tools let you record a portion of your screen</li>
                 </ul>
                 <p>This project is coded using Javascript, HTML, and CSS (see github repo linked below). I do not have access to any of the images that you upload here, as all processing is done "client-side" (i.e., <b>no images are saved or stored by me — they stay on your computer only</b>).</p>
                 <p>Feel free to reach out to discuss, ask questions, or to share your creations! You can find my instagram and email accounts through the buttons below.</p>

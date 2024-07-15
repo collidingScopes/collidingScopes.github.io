@@ -1,8 +1,6 @@
 /*
 To do list:
 Add user input options -- control animation length, width of animation
-Is there some way to allow automated gif or video making from this page?
-add about section / explanatory notes and link to original post
 add embedded ig posts to show example gallery?
 Add site OG properties
 Site logo or Gradient banner at the top?
@@ -34,6 +32,13 @@ var pauseButton = document.getElementById('pauseAnimationButton');
 pauseButton.addEventListener('click', pausePlayAnimation);
 var playAnimationToggle = false;
 
+//video recording function
+var recordBtn = document.getElementById("recordVideoButton");
+var recording = false;
+var mediaRecorder;
+var recordedChunks;
+recordBtn.addEventListener("click", recordVideo);
+    
 //Save and export the new image in png format
 var saveButton = document.getElementById('save-image-button');
 saveButton.addEventListener('click', () => {
@@ -317,12 +322,50 @@ function saveImage(){
     link.click();
 }
 
-//shortcut key presses
+//shortcut hotkey presses
 document.addEventListener('keydown', function(event) {
     if (event.key === 'p') {
         pausePlayAnimation();
-
     } else if (event.key === 's') {
         saveImage();
+    }  else if (event.key === 'r') {
+        recordVideo();
     }
 });
+
+//record html canvas element to mp4 video
+function recordVideo(){
+    recording = !recording;
+    if (recording) {
+      recordBtn.textContent = "Stop Video (r)";
+      const stream = animation.captureStream(25);
+      mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/mp4; codecs="avc1.424028, mp4a.40.2"',
+        ignoreMutedMedia: true
+      });
+      recordedChunks = [];
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+      mediaRecorder.start();
+    } else {
+      recordBtn.textContent = "Record Video (r)";
+      mediaRecorder.stop();
+      setTimeout(() => {
+        const blob = new Blob(recordedChunks, {
+          type: "video/mp4"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+  
+        const date = new Date();
+        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.mp4`;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 0);
+    }
+}
