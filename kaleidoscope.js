@@ -338,6 +338,8 @@ function recordVideo(){
     recording = !recording;
     if (recording) {
       recordBtn.textContent = "Stop Video (r)";
+      recordBtn.classList.remove("recordButton");
+      recordBtn.classList.add("recordButtonStop");
       const stream = animation.captureStream(25);
       mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'video/mp4; codecs="avc1.424028, mp4a.40.2"',
@@ -352,6 +354,8 @@ function recordVideo(){
       mediaRecorder.start();
     } else {
       recordBtn.textContent = "Record Video (r)";
+      recordBtn.classList.remove("recordButtonStop");
+      recordBtn.classList.add("recordButton");
       mediaRecorder.stop();
       setTimeout(() => {
         const blob = new Blob(recordedChunks, {

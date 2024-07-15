@@ -83,12 +83,14 @@ li {
     align-items: center;
 }
 
+/*
 button, input {
     font-size: 20px;
     font-family: Helvetica;
     margin-top: 10px;
     margin-bottom: 10px;
 }
+*/
 
 h2 {
     font-size: 40px;
@@ -228,9 +230,21 @@ button {
     cursor: pointer;
 }
 
+.recordButton{
+    border: 3px solid #4a2bb0;
+    background-color: #4a2bb0;
+    color: white;
+}
+
+.recordButtonStop{
+    border: 3px solid #b02b9c;
+    background-color: #b02b9c;
+    color: white;
+}
+
 .tableText{
     font-weight: bold;
-    font-size: 13px;
+    font-size: 14px;
     font-family: Helvetica;
 }
 
@@ -257,7 +271,7 @@ td {
 }
 
 #inputTable{
-    font-size:0.90em;
+    font-size:1em;
     text-align: center;
     min-width: 280px;
     width:80vw;
