@@ -239,6 +239,7 @@ button {
 .tableText{
     font-weight: bold;
     font-size: 13px;
+    font-family: Helvetica;
 }
 
 /* applies when screen is wide enough */ 
@@ -257,6 +258,10 @@ table {
     border-collapse: collapse;
     margin:auto;
     max-width:95%;
+}
+
+td {
+    max-width: 100px;
 }
 
 #inputTable{

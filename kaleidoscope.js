@@ -4,6 +4,9 @@ Add user input options -- control animation length, width of animation
 Is there some way to allow automated gif or video making from this page?
 add about section / explanatory notes and link to original post
 add embedded ig posts to show example gallery?
+Add site OG properties
+Site logo or Gradient banner at the top?
+Add README file 
 */
 
 //image upload variables
