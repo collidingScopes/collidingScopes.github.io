@@ -243,7 +243,7 @@ button {
 }
 
 /* applies when screen is wide enough */ 
-@media (min-width: 600px) {
+@media (min-width: 700px) {
     button, .tableText {
       font-size: 14px;
     }
@@ -261,7 +261,7 @@ table {
 }
 
 td {
-    max-width: 100px;
+    max-width: 150px;
 }
 
 #inputTable{
@@ -269,7 +269,7 @@ td {
     text-align: center;
     min-width: 280px;
     width:100vw;
-    max-width: 400px;
+    max-width: 350px;
     margin-top: 15px;
     margin-bottom: 15px;
     border-top: 1px solid black;
@@ -277,10 +277,10 @@ td {
 }
 
 /* applies when screen is wide enough */ 
-@media (min-width: 600px) {
+@media (min-width: 700px) {
     #inputTable {
         font-size:1em;
-        max-width: 600px;
+        max-width: 500px;
     }
 }
 
