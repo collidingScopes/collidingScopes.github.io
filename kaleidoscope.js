@@ -351,41 +351,48 @@ if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
 function recordVideo(){
     recording = !recording;
     if (recording) {
-      recordBtn.textContent = "Stop Video (r)";
-      recordBtn.classList.remove("recordButton");
-      recordBtn.classList.add("recordButtonStop");
-      
-      const stream = animation.captureStream(25);
-      /*
-      mediaRecorder = new MediaRecorder(stream, {
+        console.log("start video recording");
+        recordBtn.textContent = "Stop Video (r)";
+        recordBtn.classList.remove("recordButton");
+        recordBtn.classList.add("recordButtonStop");
+        
+        const stream = animation.captureStream(25);
+        /*
+        mediaRecorder = new MediaRecorder(stream, {
         mimeType: selectedVars[0],
         ignoreMutedMedia: true
-      });
-      */
-      mediaRecorder = new MediaRecorder(stream, options);
-
-      recordedChunks = [];
-      mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) {
-          recordedChunks.push(e.data);
-        }
-      };
-      mediaRecorder.start();
-    } else {
-      recordBtn.textContent = "Record Video (r)";
-      recordBtn.classList.remove("recordButtonStop");
-      recordBtn.classList.add("recordButton");
-      mediaRecorder.stop();
-      setTimeout(() => {
-        const blob = new Blob(recordedChunks, {
-          type: selectedVars[1]
         });
+        */
+        //mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder = new MediaRecorder(stream);
+
+        recordedChunks = [];
+        mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+        }
+        };
+        mediaRecorder.start();
+    } else {
+        console.log("stop video recording");
+        recordBtn.textContent = "Record Video (r)";
+        recordBtn.classList.remove("recordButtonStop");
+        recordBtn.classList.add("recordButton");
+        mediaRecorder.stop();
+        setTimeout(() => {
+        /*
+        const blob = new Blob(recordedChunks, {
+            type: selectedVars[1]
+        });
+        */
+        const blob = new Blob(recordedChunks);
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-  
+
         const date = new Date();
-        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${selectedVars[2]}`;
+        //const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${selectedVars[2]}`;
+        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.webm`;
         a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
