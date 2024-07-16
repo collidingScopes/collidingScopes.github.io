@@ -37,8 +37,9 @@ var recordBtn = document.getElementById("recordVideoButton");
 var recording = false;
 var mediaRecorder;
 var recordedChunks;
-recordBtn.addEventListener("click", recordVideo);
-    
+//recordBtn.addEventListener("click", recordVideo);
+recordBtn.addEventListener('click', toggleVideoRecording);
+
 //Save and export the new image in png format
 var saveButton = document.getElementById('save-image-button');
 saveButton.addEventListener('click', () => {
@@ -329,7 +330,7 @@ document.addEventListener('keydown', function(event) {
     } else if (event.key === 's') {
         saveImage();
     }  else if (event.key === 'r') {
-        recordVideo();
+        toggleVideoRecording();
     }
 });
 
@@ -356,9 +357,12 @@ if (MediaRecorder.isTypeSupported('video/mp4')) {
 }
 
 function recordVideo(){
+
     recording = !recording;
     if (recording) {
         console.log("start video recording");
+        console.log("Video settings: "+options+", "+format+", "+fileExtension);
+
         recordBtn.textContent = "Stop Video (r)";
         recordBtn.classList.remove("recordButton");
         recordBtn.classList.add("recordButtonStop");
@@ -405,4 +409,58 @@ function recordVideo(){
         URL.revokeObjectURL(url);
       }, 0);
     }
+}
+
+function toggleVideoRecording(){
+    
+    recording = !recording;
+    if (recording) {
+        console.log("setting up recorder");
+        let self = this;
+        this.data = [];
+
+        if (MediaRecorder.isTypeSupported('video/mp4')) {
+            // IOS does not support webm! So you have to use mp4.
+            var options = {mimeType: 'video/mp4', videoBitsPerSecond : 1000000};
+        } else {
+            // video/webm is recommended for non IOS devices
+            console.error("ERROR: Is this really an IOS device??");
+            var options = {mimeType: 'video/webm'};
+        }
+
+        let stream = animation.captureStream(15);
+        mediaRecorder = new MediaRecorder(stream, options);
+
+        recordedChunks = [];
+        mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+        }
+        };
+        mediaRecorder.start();
+
+    } else {
+        mediaRecorder.stop();
+
+        setTimeout(() => {
+        
+            const blob = new Blob(recordedChunks, {
+                type: "video/mp4"
+            });
+            
+            //const blob = new Blob(recordedChunks);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+    
+            const date = new Date();
+            const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${fileExtension}`;
+            //const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.webm`;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }, 0);
+    
+    }
+
 }
