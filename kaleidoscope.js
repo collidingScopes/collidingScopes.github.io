@@ -3,7 +3,7 @@ To do list:
 add embedded ig posts to show example gallery?
 Add site OG properties
 Site logo or Gradient banner at the top?
-Add README file
+Add example gif  to README file
 Add user input options -- control animation length, width of animation
 */
 
