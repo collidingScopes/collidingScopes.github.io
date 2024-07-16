@@ -7,7 +7,10 @@ Site logo or Gradient banner at the top?
 Add README file 
 */
 
+
 //image upload variables
+var animation = document.getElementById("animation");
+
 var imageInput = document.getElementById('imageInput');
 imageInput.addEventListener('change', readSourceImage);
 var isImageLoaded = false;
@@ -20,7 +23,7 @@ var actualHeight = 533;
 var scaledWidth = 400;
 var scaledHeight = 533;
 var widthScalingRatio = 1;
-var maxImageWidth = 400;
+var maxImageWidth = 500;
 
 var SqrtOf3_4 = Math.sqrt(3)/2;
 
@@ -38,7 +41,7 @@ var recording = false;
 var mediaRecorder;
 var recordedChunks;
 //recordBtn.addEventListener("click", recordVideo);
-recordBtn.addEventListener('click', toggleVideoRecording);
+recordBtn.addEventListener('click', recordVideoMuxer);
 
 //Save and export the new image in png format
 var saveButton = document.getElementById('save-image-button');
@@ -178,7 +181,6 @@ function createAnimation(){
     console.log("create animation");
 
     //load images
-    var animation = document.getElementById("animation");
     animation.width = animationWidth;
     animation.height = animationWidth;
     var baseImg = document.getElementById("originalImg");
@@ -330,7 +332,7 @@ document.addEventListener('keydown', function(event) {
     } else if (event.key === 's') {
         saveImage();
     }  else if (event.key === 'r') {
-        toggleVideoRecording();
+        recordVideoMuxer();
     }
 });
 
@@ -416,8 +418,6 @@ function toggleVideoRecording(){
     recording = !recording;
     if (recording) {
         console.log("setting up recorder");
-        let self = this;
-        this.data = [];
 
         if (MediaRecorder.isTypeSupported('video/mp4')) {
             // IOS does not support webm! So you have to use mp4.
@@ -433,9 +433,9 @@ function toggleVideoRecording(){
 
         recordedChunks = [];
         mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) {
-            recordedChunks.push(e.data);
-        }
+            if (e.data && e.data.size > 0) {
+                recordedChunks.push(e.data);
+            }
         };
         mediaRecorder.start();
 
@@ -444,11 +444,14 @@ function toggleVideoRecording(){
 
         setTimeout(() => {
         
+            /*
             const blob = new Blob(recordedChunks, {
                 type: "video/mp4"
             });
-            
+            */
             //const blob = new Blob(recordedChunks);
+            var blob = new Blob(recordedChunks, {type: "video/mp4"});
+
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
@@ -459,8 +462,129 @@ function toggleVideoRecording(){
             a.download = filename;
             a.click();
             URL.revokeObjectURL(url);
-        }, 0);
+        }, 200);
     
     }
 
 }
+
+async function recordVideoMuxer() {
+    console.log("start video recording");
+    console.log("Video dimensions: "+animation.width+", "+animation.height);
+    var recordVideoState = true;
+    const ctx = animation.getContext("2d", {
+      // This forces the use of a software (instead of hardware accelerated) 2D canvas
+      // This isn't necessary, but produces quicker results
+      willReadFrequently: true,
+      // Desynchronizes the canvas paint cycle from the event loop
+      // Should be less necessary with OffscreenCanvas, but with a real canvas you will want this
+      desynchronized: true,
+    });
+  
+    const duration = 10; //duration in seconds
+    const numFrames = duration * fps;
+  
+    let muxer = new Mp4Muxer.Muxer({
+      target: new Mp4Muxer.ArrayBufferTarget(),
+  
+      video: {
+        // If you change this, make sure to change the VideoEncoder codec as well
+        codec: "avc",
+        width: animation.width,
+        height: animation.height,
+      },
+  
+      // mp4-muxer docs claim you should always use this with ArrayBufferTarget
+      fastStart: "in-memory",
+    });
+  
+    let videoEncoder = new VideoEncoder({
+      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      error: (e) => console.error(e),
+    });
+  
+    // This codec should work in most browsers
+    // See https://dmnsgn.github.io/media-codecs for list of codecs and see if your browser supports
+    videoEncoder.configure({
+      codec: "avc1.42003e",
+      width: animation.width,
+      height: animation.height,
+      bitrate: 3_600_000,
+      bitrateMode: "constant",
+    });
+    //bitrate: 500_000,
+
+  
+    /*
+    for(var frameNumber=0; frameNumber<1000; frameNumber++) {
+        renderCanvasToVideoFrameAndEncode({
+            animation,
+            videoEncoder,
+            frameNumber,
+            fps
+        })
+    }
+    */
+
+    var recordVideoState = true;
+    var frameNumber = 0;
+    setTimeout(finalizeVideo,1000*duration+500); //finish and export video after x seconds
+    
+    //take a snapshot of the canvas every x miliseconds and encode to video
+    var videoRecordInterval = setInterval(
+        function(){
+            if(recordVideoState == true){
+                renderCanvasToVideoFrameAndEncode({
+                    animation,
+                    videoEncoder,
+                    frameNumber,
+                    fps
+                })
+                frameNumber++;
+            }
+        } , 1000/fps);
+
+    //finish and export video after x seconds
+    async function finalizeVideo(){
+        recordVideoState = false;
+        clearInterval(videoRecordInterval);
+        // Forces all pending encodes to complete
+        await videoEncoder.flush();
+        muxer.finalize();
+        let buffer = muxer.target.buffer;
+        downloadBlob(new Blob([buffer]));
+    }
+
+}
+  
+async function renderCanvasToVideoFrameAndEncode({
+    canvas,
+    videoEncoder,
+    frameNumber,
+    fps,
+}) {
+    let frame = new VideoFrame(animation, {
+        // Equally spaces frames out depending on frames per second
+        timestamp: (frameNumber * 1e6) / fps,
+    });
+
+    // The encode() method of the VideoEncoder interface asynchronously encodes a VideoFrame
+    videoEncoder.encode(frame);
+
+    // The close() method of the VideoFrame interface clears all states and releases the reference to the media resource.
+    frame.close();
+}
+  
+function downloadBlob(blob) {
+    let url = window.URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    const date = new Date();
+    const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${fileExtension}`;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+  
