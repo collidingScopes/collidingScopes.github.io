@@ -339,7 +339,9 @@ var mp4Vars = ['video/mp4; codecs="avc1.424028, mp4a.40.2"',"video/mp4",".mp4"];
 var webmVars = ['video/webm;codecs=vp9',"video/webm",".webm"]
 var selectedVars = webmVars;
 
-var options;
+options = {mimeType: 'video/webm; codecs="avc1.42E01F"'};
+
+/*
 if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
     options = {mimeType: 'video/webm; codecs=vp9'};
 } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
@@ -347,6 +349,7 @@ if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
 } else {
     options = {mimeType: 'video/webm'};
 }
+*/
 
 function recordVideo(){
     recording = !recording;
@@ -363,8 +366,8 @@ function recordVideo(){
         ignoreMutedMedia: true
         });
         */
-        //mediaRecorder = new MediaRecorder(stream, options);
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(stream, options);
+        //mediaRecorder = new MediaRecorder(stream);
 
         recordedChunks = [];
         mediaRecorder.ondataavailable = e => {
