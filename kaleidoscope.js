@@ -339,17 +339,31 @@ var mp4Vars = ['video/mp4; codecs="avc1.424028, mp4a.40.2"',"video/mp4",".mp4"];
 var webmVars = ['video/webm;codecs=vp9',"video/webm",".webm"]
 var selectedVars = webmVars;
 
+var options;
+if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+    options = {mimeType: 'video/webm; codecs=vp9'};
+} else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+    options = {mimeType: 'video/webm; codecs=vp8'};
+} else {
+    options = {mimeType: 'video/webm'};
+}
+
 function recordVideo(){
     recording = !recording;
     if (recording) {
       recordBtn.textContent = "Stop Video (r)";
       recordBtn.classList.remove("recordButton");
       recordBtn.classList.add("recordButtonStop");
+      
       const stream = animation.captureStream(25);
+      /*
       mediaRecorder = new MediaRecorder(stream, {
         mimeType: selectedVars[0],
         ignoreMutedMedia: true
       });
+      */
+      mediaRecorder = new MediaRecorder(stream, options);
+
       recordedChunks = [];
       mediaRecorder.ondataavailable = e => {
         if (e.data.size > 0) {
