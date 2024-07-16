@@ -334,6 +334,11 @@ document.addEventListener('keydown', function(event) {
 });
 
 //record html canvas element to mp4 video
+
+var mp4Vars = ['video/mp4; codecs="avc1.424028, mp4a.40.2"',"video/mp4",".mp4"];
+var webmVars = ['video/webm;codecs=vp9',"video/webm",".webm"]
+var selectedVars = webmVars;
+
 function recordVideo(){
     recording = !recording;
     if (recording) {
@@ -342,7 +347,7 @@ function recordVideo(){
       recordBtn.classList.add("recordButtonStop");
       const stream = animation.captureStream(25);
       mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'video/mp4; codecs="avc1.424028, mp4a.40.2"',
+        mimeType: selectedVars[0],
         ignoreMutedMedia: true
       });
       recordedChunks = [];
@@ -359,14 +364,14 @@ function recordVideo(){
       mediaRecorder.stop();
       setTimeout(() => {
         const blob = new Blob(recordedChunks, {
-          type: "video/mp4"
+          type: selectedVars[1]
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
   
         const date = new Date();
-        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.mp4`;
+        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${selectedVars[2]}`;
         a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
