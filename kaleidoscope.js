@@ -338,18 +338,22 @@ document.addEventListener('keydown', function(event) {
 var mp4Vars = ['video/mp4; codecs="avc1.424028, mp4a.40.2"',"video/mp4",".mp4"];
 var webmVars = ['video/webm;codecs=vp9',"video/webm",".webm"]
 var selectedVars = webmVars;
+var options;
+var format;
+var fileExtension;
 
-options = {mimeType: 'video/webm; codecs="avc1.42E01F"'};
-
-/*
-if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-    options = {mimeType: 'video/webm; codecs=vp9'};
-} else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
-    options = {mimeType: 'video/webm; codecs=vp8'};
+if (MediaRecorder.isTypeSupported('video/mp4')) {
+    // IOS does not support webm! So you have to use mp4.
+    options = {mimeType: 'video/mp4', videoBitsPerSecond : 1000000};
+    format = "video/mp4";
+    fileExtension = ".mp4";
 } else {
+    // video/webm is recommended for non IOS devices
+    console.error("ERROR: Is this really an IOS device??");
     options = {mimeType: 'video/webm'};
+    format = "video/webm";
+    fileExtension = ".webm";
 }
-*/
 
 function recordVideo(){
     recording = !recording;
@@ -359,7 +363,7 @@ function recordVideo(){
         recordBtn.classList.remove("recordButton");
         recordBtn.classList.add("recordButtonStop");
         
-        const stream = animation.captureStream(25);
+        const stream = animation.captureStream(15);
         /*
         mediaRecorder = new MediaRecorder(stream, {
         mimeType: selectedVars[0],
@@ -383,19 +387,19 @@ function recordVideo(){
         recordBtn.classList.add("recordButton");
         mediaRecorder.stop();
         setTimeout(() => {
-        /*
+        
         const blob = new Blob(recordedChunks, {
-            type: selectedVars[1]
+            type: format
         });
-        */
-        const blob = new Blob(recordedChunks);
+        
+        //const blob = new Blob(recordedChunks);
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
 
         const date = new Date();
-        //const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${selectedVars[2]}`;
-        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.webm`;
+        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${fileExtension}`;
+        //const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.webm`;
         a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
