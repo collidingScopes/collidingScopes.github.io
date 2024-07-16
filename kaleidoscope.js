@@ -1,16 +1,14 @@
 /*
 To do list:
-Add user input options -- control animation length, width of animation
 add embedded ig posts to show example gallery?
 Add site OG properties
 Site logo or Gradient banner at the top?
-Add README file 
+Add README file
+Add user input options -- control animation length, width of animation
 */
-
 
 //image upload variables
 var animation = document.getElementById("animation");
-
 var imageInput = document.getElementById('imageInput');
 imageInput.addEventListener('change', readSourceImage);
 var isImageLoaded = false;
@@ -30,24 +28,31 @@ var SqrtOf3_4 = Math.sqrt(3)/2;
 //cover loading screen
 var loadingScreen = document.getElementById("coverScreen");
 
-//buttons
+/*
 var pauseButton = document.getElementById('pauseAnimationButton');
 pauseButton.addEventListener('click', pausePlayAnimation);
 var playAnimationToggle = false;
+*/
 
 //video recording function
 var recordBtn = document.getElementById("recordVideoButton");
 var recording = false;
 var mediaRecorder;
 var recordedChunks;
-//recordBtn.addEventListener("click", recordVideo);
 recordBtn.addEventListener('click', recordVideoMuxer);
+
+//video duration input
+var videoDurationInput = document.getElementById("videoDurationInput");
+videoDurationInput.addEventListener('change', getUserInputs);
+var videoDuration = Math.max(1,Math.min(120,Number(videoDurationInput.value)));
 
 //Save and export the new image in png format
 var saveButton = document.getElementById('save-image-button');
+/*
 saveButton.addEventListener('click', () => {
     saveImage();
 });
+*/
 
 //user control sliders
 var animationSpeedInput = document.getElementById('speedInput');
@@ -72,9 +77,12 @@ setTimeout(createAnimation, 2000);
 function getUserInputs(){
     var speedInputValue = Number(animationSpeedInput.value);
     animationSpeed = 8000/speedInputValue; //larger value gives slower animation
-    console.log("animation speed: "+animationSpeed)
+    console.log("animation speed: "+animationSpeed);
+    videoDuration = Math.max(1,Math.min(60,Number(videoDurationInput.value)));
+    console.log("video record duration (seconds): "+videoDuration);
 }
 
+//read and accept user input image
 function readSourceImage(){
 
     //remove any existing images
@@ -148,6 +156,7 @@ function readSourceImage(){
     
 }
 
+//flip input image horizontally
 function generateFlippedImage(){
     console.log("generate flipped image");
     var originalImg = document.getElementById('originalImg');
@@ -170,6 +179,7 @@ function generateFlippedImage(){
 
 }
 
+//based on Luke Hannam's work: https://www.pepperoni.blog/canvas-kaleidoscope/
 function createAnimation(){
     
     loadingScreen.classList.add("hidden");
@@ -305,6 +315,7 @@ function createAnimation(){
 
 }
 
+//start or stop animation
 function pausePlayAnimation(){
     if(playAnimationToggle == true){
         playAnimationToggle = false;
@@ -315,6 +326,7 @@ function pausePlayAnimation(){
     }
 }
 
+//take screenshot of canvas at current position, export as png
 function saveImage(){
     const link = document.createElement('a');
     link.href = animation.toDataURL();
@@ -336,141 +348,18 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-//record html canvas element to mp4 video
-
-var mp4Vars = ['video/mp4; codecs="avc1.424028, mp4a.40.2"',"video/mp4",".mp4"];
-var webmVars = ['video/webm;codecs=vp9',"video/webm",".webm"]
-var selectedVars = webmVars;
-var options;
-var format;
-var fileExtension;
-
-if (MediaRecorder.isTypeSupported('video/mp4')) {
-    // IOS does not support webm! So you have to use mp4.
-    options = {mimeType: 'video/mp4', videoBitsPerSecond : 1000000};
-    format = "video/mp4";
-    fileExtension = ".mp4";
-} else {
-    // video/webm is recommended for non IOS devices
-    console.error("ERROR: Is this really an IOS device??");
-    options = {mimeType: 'video/webm'};
-    format = "video/webm";
-    fileExtension = ".webm";
-}
-
-function recordVideo(){
-
-    recording = !recording;
-    if (recording) {
-        console.log("start video recording");
-        console.log("Video settings: "+options+", "+format+", "+fileExtension);
-
-        recordBtn.textContent = "Stop Video (r)";
-        recordBtn.classList.remove("recordButton");
-        recordBtn.classList.add("recordButtonStop");
-        
-        const stream = animation.captureStream(15);
-        /*
-        mediaRecorder = new MediaRecorder(stream, {
-        mimeType: selectedVars[0],
-        ignoreMutedMedia: true
-        });
-        */
-        mediaRecorder = new MediaRecorder(stream, options);
-        //mediaRecorder = new MediaRecorder(stream);
-
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) {
-            recordedChunks.push(e.data);
-        }
-        };
-        mediaRecorder.start();
-    } else {
-        console.log("stop video recording");
-        recordBtn.textContent = "Record Video (r)";
-        recordBtn.classList.remove("recordButtonStop");
-        recordBtn.classList.add("recordButton");
-        mediaRecorder.stop();
-        setTimeout(() => {
-        
-        const blob = new Blob(recordedChunks, {
-            type: format
-        });
-        
-        //const blob = new Blob(recordedChunks);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-
-        const date = new Date();
-        const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${fileExtension}`;
-        //const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.webm`;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-      }, 0);
-    }
-}
-
-function toggleVideoRecording(){
-    
-    recording = !recording;
-    if (recording) {
-        console.log("setting up recorder");
-
-        if (MediaRecorder.isTypeSupported('video/mp4')) {
-            // IOS does not support webm! So you have to use mp4.
-            var options = {mimeType: 'video/mp4', videoBitsPerSecond : 1000000};
-        } else {
-            // video/webm is recommended for non IOS devices
-            console.error("ERROR: Is this really an IOS device??");
-            var options = {mimeType: 'video/webm'};
-        }
-
-        let stream = animation.captureStream(15);
-        mediaRecorder = new MediaRecorder(stream, options);
-
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = e => {
-            if (e.data && e.data.size > 0) {
-                recordedChunks.push(e.data);
-            }
-        };
-        mediaRecorder.start();
-
-    } else {
-        mediaRecorder.stop();
-
-        setTimeout(() => {
-        
-            /*
-            const blob = new Blob(recordedChunks, {
-                type: "video/mp4"
-            });
-            */
-            //const blob = new Blob(recordedChunks);
-            var blob = new Blob(recordedChunks, {type: "video/mp4"});
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-    
-            const date = new Date();
-            const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${fileExtension}`;
-            //const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.webm`;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }, 200);
-    
-    }
-
-}
-
+//record html canvas element and export as mp4 video
+//source: https://devtails.xyz/adam/how-to-save-html-canvas-to-mp4-using-web-codecs-api
 async function recordVideoMuxer() {
     console.log("start video recording");
     console.log("Video dimensions: "+animation.width+", "+animation.height);
+
+    //hide input table and display user message
+    document.getElementById("inputTable").classList.add("hidden");
+    document.getElementById("videoRecordingMessageDiv").innerHTML = 
+    "Video recording underway. The video will be saved to your downloads folder in "+videoDuration+" seconds.<br><br>This feature does not currently work on Mobile -- please try on Desktop instead.";
+    document.getElementById("videoRecordingMessageDiv").classList.remove("hidden");
+    
     var recordVideoState = true;
     const ctx = animation.getContext("2d", {
       // This forces the use of a software (instead of hardware accelerated) 2D canvas
@@ -480,9 +369,6 @@ async function recordVideoMuxer() {
       // Should be less necessary with OffscreenCanvas, but with a real canvas you will want this
       desynchronized: true,
     });
-  
-    const duration = 10; //duration in seconds
-    const numFrames = duration * fps;
   
     let muxer = new Mp4Muxer.Muxer({
       target: new Mp4Muxer.ArrayBufferTarget(),
@@ -509,26 +395,13 @@ async function recordVideoMuxer() {
       codec: "avc1.42003e",
       width: animation.width,
       height: animation.height,
-      bitrate: 3_600_000,
+      bitrate: 7_200_000,
       bitrateMode: "constant",
     });
-    //bitrate: 500_000,
-
-  
-    /*
-    for(var frameNumber=0; frameNumber<1000; frameNumber++) {
-        renderCanvasToVideoFrameAndEncode({
-            animation,
-            videoEncoder,
-            frameNumber,
-            fps
-        })
-    }
-    */
 
     var recordVideoState = true;
     var frameNumber = 0;
-    setTimeout(finalizeVideo,1000*duration+500); //finish and export video after x seconds
+    setTimeout(finalizeVideo,1000*videoDuration+200); //finish and export video after x seconds
     
     //take a snapshot of the canvas every x miliseconds and encode to video
     var videoRecordInterval = setInterval(
@@ -553,6 +426,11 @@ async function recordVideoMuxer() {
         muxer.finalize();
         let buffer = muxer.target.buffer;
         downloadBlob(new Blob([buffer]));
+
+        //show input table again and hide user message
+        document.getElementById("inputTable").classList.remove("hidden");
+        document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
+
     }
 
 }
@@ -581,7 +459,7 @@ function downloadBlob(blob) {
     a.style.display = "none";
     a.href = url;
     const date = new Date();
-    const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}${fileExtension}`;
+    const filename = `kaleidoscope_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.mp4`;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
