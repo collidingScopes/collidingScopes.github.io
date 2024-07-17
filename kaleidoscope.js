@@ -52,6 +52,10 @@ saveButton.addEventListener('click', () => {
 });
 */
 
+var finishedBlob;
+var downloadButton = document.getElementById("downloadButton");
+downloadButton.addEventListener("click",downloadBlob);
+
 //user control sliders
 var animationSpeedInput = document.getElementById('speedInput');
 animationSpeedInput.addEventListener('change', getUserInputs);
@@ -417,16 +421,18 @@ async function recordVideoMuxer() {
 
     //finish and export video after x seconds
     async function finalizeVideo(){
+        console.log("finalize video");
         recordVideoState = false;
         clearInterval(videoRecordInterval);
         // Forces all pending encodes to complete
         await videoEncoder.flush();
         muxer.finalize();
         let buffer = muxer.target.buffer;
-        downloadBlob(new Blob([buffer]));
+        finishedBlob = new Blob([buffer]); 
+        //downloadBlob(new Blob([buffer]));
 
         //show input table again and hide user message
-        document.getElementById("inputTable").classList.remove("hidden");
+        downloadButton.classList.remove("hidden");
         document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
 
     }
@@ -451,8 +457,8 @@ async function renderCanvasToVideoFrameAndEncode({
     frame.close();
 }
   
-function downloadBlob(blob) {
-    let url = window.URL.createObjectURL(blob);
+function downloadBlob() {
+    let url = window.URL.createObjectURL(finishedBlob);
     let a = document.createElement("a");
     a.style.display = "none";
     a.href = url;
@@ -462,5 +468,9 @@ function downloadBlob(blob) {
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
+    
+    downloadButton.classList.add("hidden");
+    document.getElementById("inputTable").classList.remove("hidden");
+
 }
   
