@@ -2,20 +2,8 @@
 To do list:
 add embedded ig posts to show example gallery?
 Site logo or Gradient banner at the top?
-Add user input options -- control animation length, width of animation
+Add user input options -- custom height/width of final animation
 */
-
-//detect user browser
-var ua = navigator.userAgent;
-var isSafari = false;
-var isIOS = false;
-if(ua.includes("Safari")){
-    isSafari = true;
-}
-if(ua.includes("iPhone") || ua.includes("iPad") || ua.includes("iPod")){
-    isIOS = true;
-}
-console.log("isSafari: "+isSafari+", isIOS: "+isIOS);
 
 //image upload variables
 var animation = document.getElementById("animation");
@@ -31,18 +19,24 @@ var actualHeight = 533;
 var scaledWidth = 400;
 var scaledHeight = 533;
 var widthScalingRatio = 1;
-var maxImageWidth = 450;
+var maxImageWidth = 450; //could be tweaked for custom output dimensions
 
 var SqrtOf3_4 = Math.sqrt(3)/2;
 
 //cover loading screen
 var loadingScreen = document.getElementById("coverScreen");
 
-/*
-var pauseButton = document.getElementById('pauseAnimationButton');
-pauseButton.addEventListener('click', pausePlayAnimation);
-var playAnimationToggle = false;
-*/
+//detect user browser
+var ua = navigator.userAgent;
+var isSafari = false;
+var isIOS = false;
+if(ua.includes("Safari")){
+    isSafari = true;
+}
+if(ua.includes("iPhone") || ua.includes("iPad") || ua.includes("iPod")){
+    isIOS = true;
+}
+console.log("isSafari: "+isSafari+", isIOS: "+isIOS);
 
 //video recording function
 var recordBtn = document.getElementById("recordVideoButton");
@@ -50,6 +44,8 @@ var recording = false;
 var mediaRecorder;
 var recordedChunks;
 recordBtn.addEventListener('click', chooseRecordingFunction);
+var finishedBlob;
+var recordingMessageDiv = document.getElementById("videoRecordingMessageDiv");
 
 //video duration input
 var videoDurationInput = document.getElementById("videoDurationInput");
@@ -58,13 +54,7 @@ var videoDuration = Math.max(1,Math.min(120,Number(videoDurationInput.value)));
 
 //Save and export the new image in png format
 var saveButton = document.getElementById('save-image-button');
-/*
-saveButton.addEventListener('click', () => {
-    saveImage();
-});
-*/
 
-var finishedBlob;
 /*
 var downloadButton = document.getElementById("downloadButton");
 downloadButton.addEventListener("click",downloadBlob);
@@ -88,7 +78,6 @@ var animationInterval;
 //this runs the default image animation at startup
 getUserInputs();
 setTimeout(createAnimation, 2000);
-
 
 function getUserInputs(){
     var speedInputValue = Number(animationSpeedInput.value);
@@ -317,17 +306,16 @@ function createAnimation(){
 
     //this creates the animation by calling the functions again and again every x miliseconds
     animationInterval = setInterval(
-        function(){
-            if(playAnimationToggle == true){
-                fn(false);
-                ctx.translate(animationStep*patDim, height);
-                fn(true);
-                ctx.translate(animationStep*-1*patDim, -height);
-                tile();
-            }
+    function(){
+        if(playAnimationToggle == true){
+            fn(false);
+            ctx.translate(animationStep*patDim, height);
+            fn(true);
+            ctx.translate(animationStep*-1*patDim, -height);
+            tile();
+        }
 
-        } , 1000/fps);
-
+    } , 1000/fps);
 
 }
 
@@ -342,6 +330,7 @@ function pausePlayAnimation(){
     }
 }
 
+//HELPER FUNCTIONS BELOW
 //take screenshot of canvas at current position, export as png
 function saveImage(){
     const link = document.createElement('a');
@@ -380,9 +369,8 @@ async function recordVideoMuxer() {
 
     //hide input table and display user message
     document.getElementById("inputTable").classList.add("hidden");
-    document.getElementById("videoRecordingMessageDiv").innerHTML = 
-    "Video recording underway. The video will be saved to your downloads folder in "+videoDuration+" seconds.<br><br>This feature can be a bit buggy on Mobile -- if it doesn't work, please try on Desktop instead.";
-    document.getElementById("videoRecordingMessageDiv").classList.remove("hidden");
+    recordingMessageCountdown(videoDuration);
+    recordingMessageDiv.classList.remove("hidden");
     
     var recordVideoState = true;
     const ctx = animation.getContext("2d", {
@@ -455,11 +443,10 @@ async function recordVideoMuxer() {
         downloadBlob(new Blob([buffer]));
 
         //hide user message, show download button
-        document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
+        recordingMessageDiv.classList.add("hidden");
         document.getElementById("inputTable").classList.remove("hidden");
 
     }
-
 }
   
 async function renderCanvasToVideoFrameAndEncode({
@@ -480,8 +467,6 @@ async function renderCanvasToVideoFrameAndEncode({
     frame.close();
 }
 
-
-  
 function downloadBlob() {
     console.log("download video");
     let url = window.URL.createObjectURL(finishedBlob);
@@ -494,9 +479,9 @@ function downloadBlob() {
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
-
 }
 
+//record and download videos on mobile devices
 function startMobileRecording(){
     
     var stream = animation.captureStream(fps);
@@ -508,11 +493,10 @@ function startMobileRecording(){
 
     //hide input table and display user message
     document.getElementById("inputTable").classList.add("hidden");
-    document.getElementById("videoRecordingMessageDiv").innerHTML = 
-    "Video recording underway. The video will be saved to your downloads folder in "+videoDuration+" seconds.<br><br>This feature can be a bit buggy on Mobile -- if it doesn't work, please try on Desktop instead.";
-    document.getElementById("videoRecordingMessageDiv").classList.remove("hidden");
+    recordingMessageCountdown(videoDuration);
+    recordingMessageDiv.classList.remove("hidden");
     
-    recorder.start(); //moved here
+    recorder.start();
     capturing = true;
 
     setTimeout(function() {
@@ -528,10 +512,27 @@ function finishMobileRecording(e) {
         downloadBlob(finishedBlob);
         
         //hide user message, show download button
-        document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
+        recordingMessageDiv.classList.add("hidden");
         document.getElementById("inputTable").classList.remove("hidden");
 
     },500);
 
+}
+
+function recordingMessageCountdown(duration){
+    
+    var secondsLeft = Math.ceil(duration);
+
+    var countdownInterval = setInterval(function(){
+        secondsLeft--;
+        recordingMessageDiv.innerHTML = 
+        "Video recording underway. The video will be saved to your downloads folder in <span id=\"secondsLeft\">"+secondsLeft+"</span> seconds.<br><br>This feature can be a bit buggy on Mobile -- if it doesn't work, please try on Desktop instead.";  
+        
+        if(secondsLeft <= 0){
+            console.log("clear countdown interval");
+            clearInterval(countdownInterval);
+        }
+    },1000);
+    
 }
   

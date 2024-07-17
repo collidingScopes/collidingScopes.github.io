@@ -291,11 +291,23 @@ td {
 }
 
 #videoRecordingMessageDiv{
-    background-color: #185856;
+    background: rgba(0, 0, 0, 0.75);
     color:white;
     font-size: 20px;
     font-weight: bold;
     padding: 5px;
+}
+
+.sticky-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+#secondsLeft {
+    font-size: 1.2em;
+    color: #b02b9c;
 }
 
 /*floating loading screen*/
