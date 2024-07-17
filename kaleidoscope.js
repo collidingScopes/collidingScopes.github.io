@@ -19,7 +19,7 @@ var actualHeight = 533;
 var scaledWidth = 400;
 var scaledHeight = 533;
 var widthScalingRatio = 1;
-var maxImageWidth = 500;
+var maxImageWidth = 450;
 
 var SqrtOf3_4 = Math.sqrt(3)/2;
 
@@ -359,7 +359,7 @@ async function recordVideoMuxer() {
     //hide input table and display user message
     document.getElementById("inputTable").classList.add("hidden");
     document.getElementById("videoRecordingMessageDiv").innerHTML = 
-    "Video recording underway. The video will be saved to your downloads folder in "+videoDuration+" seconds.<br><br>This feature does not currently work on Mobile -- please try on Desktop instead.";
+    "Video recording underway. A download button will be shown in "+videoDuration+" seconds.<br><br>This feature does not currently work on Mobile -- please try on Desktop instead.";
     document.getElementById("videoRecordingMessageDiv").classList.remove("hidden");
     
     var recordVideoState = true;
@@ -394,12 +394,13 @@ async function recordVideoMuxer() {
     // This codec should work in most browsers
     // See https://dmnsgn.github.io/media-codecs for list of codecs and see if your browser supports
     videoEncoder.configure({
-      codec: "avc1.42003e",
+      codec: "avc1.42001f",
       width: animation.width,
       height: animation.height,
       bitrate: 7_200_000,
       bitrateMode: "constant",
     });
+    //codec: "avc1.42003e",
 
     var recordVideoState = true;
     var frameNumber = 0;
@@ -431,9 +432,9 @@ async function recordVideoMuxer() {
         finishedBlob = new Blob([buffer]); 
         //downloadBlob(new Blob([buffer]));
 
-        //show input table again and hide user message
-        downloadButton.classList.remove("hidden");
+        //hide user message, show download button
         document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
+        downloadButton.classList.remove("hidden");
 
     }
 
@@ -458,6 +459,7 @@ async function renderCanvasToVideoFrameAndEncode({
 }
   
 function downloadBlob() {
+    console.log("download video");
     let url = window.URL.createObjectURL(finishedBlob);
     let a = document.createElement("a");
     a.style.display = "none";
@@ -469,6 +471,7 @@ function downloadBlob() {
     a.click();
     window.URL.revokeObjectURL(url);
     
+    //hide download button, show user menu
     downloadButton.classList.add("hidden");
     document.getElementById("inputTable").classList.remove("hidden");
 
