@@ -293,9 +293,10 @@ td {
 #videoRecordingMessageDiv{
     background: rgba(0, 0, 0, 0.75);
     color:white;
+    font-family: helvetica;
     font-size: 20px;
     font-weight: bold;
-    padding: 5px;
+    padding: 8px;
 }
 
 .sticky-bottom {

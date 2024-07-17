@@ -19,7 +19,7 @@ var actualHeight = 533;
 var scaledWidth = 400;
 var scaledHeight = 533;
 var widthScalingRatio = 1;
-var maxImageWidth = 450; //could be tweaked for custom output dimensions
+var maxImageWidth = 500; //could be tweaked for custom output dimensions
 
 var SqrtOf3_4 = Math.sqrt(3)/2;
 
@@ -404,13 +404,14 @@ async function recordVideoMuxer() {
     // This codec should work in most browsers
     // See https://dmnsgn.github.io/media-codecs for list of codecs and see if your browser supports
     videoEncoder.configure({
-      codec: "avc1.42001f",
+      codec: "avc1.42003e",
       width: animation.width,
       height: animation.height,
       bitrate: 7_200_000,
       bitrateMode: "constant",
     });
-    //codec: "avc1.42003e",
+    //NEW codec: "avc1.42003e",
+    //ORIGINAL codec: "avc1.42001f",
 
     var recordVideoState = true;
     var frameNumber = 0;
