@@ -6,6 +6,7 @@ Built using javascript, HTML, CSS.
 
 Enormous thanks and credits to Luke Hannam, whose <a href="https://www.pepperoni.blog/canvas-kaleidoscope/" target="_blank" rel="noopener">blog post</a> explained the code and mechanics for creating kaleidoscope animations in javascript.
 
+<img src="images/kaleidoscopeExample.png">
 <img src="images/HKAnimation.gif">
 
 License
