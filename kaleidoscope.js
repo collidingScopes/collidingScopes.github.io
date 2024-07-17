@@ -30,13 +30,17 @@ var loadingScreen = document.getElementById("coverScreen");
 var ua = navigator.userAgent;
 var isSafari = false;
 var isIOS = false;
+var isAndroid = false;
 if(ua.includes("Safari")){
     isSafari = true;
 }
 if(ua.includes("iPhone") || ua.includes("iPad") || ua.includes("iPod")){
     isIOS = true;
 }
-console.log("isSafari: "+isSafari+", isIOS: "+isIOS);
+if(ua.includes("Android")){
+    isAndroid = true;
+}
+console.log("isSafari: "+isSafari+", isIOS: "+isIOS+", isAndroid: "+isAndroid);
 
 //video recording function
 var recordBtn = document.getElementById("recordVideoButton");
@@ -354,7 +358,7 @@ document.addEventListener('keydown', function(event) {
 });
 
 function chooseRecordingFunction(){
-    if(isIOS){
+    if(isIOS || isAndroid){
         startMobileRecording();
     }else {
         recordVideoMuxer();
