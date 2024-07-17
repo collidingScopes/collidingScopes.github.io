@@ -8,7 +8,7 @@ Add user input options -- control animation length, width of animation
 //detect user browser
 var ua = navigator.userAgent;
 var isSafari = false;
-var isIOS = true;
+var isIOS = false;
 if(ua.includes("Safari")){
     isSafari = true;
 }
@@ -65,8 +65,10 @@ saveButton.addEventListener('click', () => {
 */
 
 var finishedBlob;
+/*
 var downloadButton = document.getElementById("downloadButton");
 downloadButton.addEventListener("click",downloadBlob);
+*/
 
 //user control sliders
 var animationSpeedInput = document.getElementById('speedInput');
@@ -379,7 +381,7 @@ async function recordVideoMuxer() {
     //hide input table and display user message
     document.getElementById("inputTable").classList.add("hidden");
     document.getElementById("videoRecordingMessageDiv").innerHTML = 
-    "Video recording underway. A download button will be shown in "+videoDuration+" seconds.<br><br>This feature does not currently work on Mobile -- please try on Desktop instead.";
+    "Video recording underway. The video will be saved to your downloads folder in "+videoDuration+" seconds.<br><br>This feature can be a bit buggy on Mobile -- if it doesn't work, please try on Desktop instead.";
     document.getElementById("videoRecordingMessageDiv").classList.remove("hidden");
     
     var recordVideoState = true;
@@ -450,11 +452,11 @@ async function recordVideoMuxer() {
         muxer.finalize();
         let buffer = muxer.target.buffer;
         finishedBlob = new Blob([buffer]); 
-        //downloadBlob(new Blob([buffer]));
+        downloadBlob(new Blob([buffer]));
 
         //hide user message, show download button
         document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
-        downloadButton.classList.remove("hidden");
+        document.getElementById("inputTable").classList.remove("hidden");
 
     }
 
@@ -492,10 +494,6 @@ function downloadBlob() {
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
-    
-    //hide download button, show user menu
-    downloadButton.classList.add("hidden");
-    document.getElementById("inputTable").classList.remove("hidden");
 
 }
 
@@ -511,7 +509,7 @@ function startMobileRecording(){
     //hide input table and display user message
     document.getElementById("inputTable").classList.add("hidden");
     document.getElementById("videoRecordingMessageDiv").innerHTML = 
-    "Video recording underway. A download button will be shown in "+videoDuration+" seconds.<br><br>This feature does not currently work on Mobile -- please try on Desktop instead.";
+    "Video recording underway. The video will be saved to your downloads folder in "+videoDuration+" seconds.<br><br>This feature can be a bit buggy on Mobile -- if it doesn't work, please try on Desktop instead.";
     document.getElementById("videoRecordingMessageDiv").classList.remove("hidden");
     
     recorder.start(); //moved here
@@ -527,12 +525,11 @@ function finishMobileRecording(e) {
         console.log("finish simple video recording");
         var videoData = [ e.data ];
         finishedBlob = new Blob(videoData, { 'type': 'video/mp4' });
-        //console.log(finishedBlob);
-        //downloadBlob(finishedBlob);
+        downloadBlob(finishedBlob);
         
         //hide user message, show download button
         document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
-        downloadButton.classList.remove("hidden");
+        document.getElementById("inputTable").classList.remove("hidden");
 
     },500);
 
