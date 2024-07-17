@@ -5,6 +5,18 @@ Site logo or Gradient banner at the top?
 Add user input options -- control animation length, width of animation
 */
 
+//detect user browser
+var ua = navigator.userAgent;
+var isSafari = false;
+var isIOS = true;
+if(ua.includes("Safari")){
+    isSafari = true;
+}
+if(ua.includes("iPhone") || ua.includes("iPad") || ua.includes("iPod")){
+    isIOS = true;
+}
+console.log("isSafari: "+isSafari+", isIOS: "+isIOS);
+
 //image upload variables
 var animation = document.getElementById("animation");
 var imageInput = document.getElementById('imageInput');
@@ -37,7 +49,7 @@ var recordBtn = document.getElementById("recordVideoButton");
 var recording = false;
 var mediaRecorder;
 var recordedChunks;
-recordBtn.addEventListener('click', recordVideoMuxer);
+recordBtn.addEventListener('click', chooseRecordingFunction);
 
 //video duration input
 var videoDurationInput = document.getElementById("videoDurationInput");
@@ -350,10 +362,18 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+function chooseRecordingFunction(){
+    if(isIOS){
+        startMobileRecording();
+    }else {
+        recordVideoMuxer();
+    }
+}
+
 //record html canvas element and export as mp4 video
 //source: https://devtails.xyz/adam/how-to-save-html-canvas-to-mp4-using-web-codecs-api
 async function recordVideoMuxer() {
-    console.log("start video recording");
+    console.log("start muxer video recording");
     console.log("Video dimensions: "+animation.width+", "+animation.height);
 
     //hide input table and display user message
@@ -422,7 +442,7 @@ async function recordVideoMuxer() {
 
     //finish and export video after x seconds
     async function finalizeVideo(){
-        console.log("finalize video");
+        console.log("finalize muxer video");
         recordVideoState = false;
         clearInterval(videoRecordInterval);
         // Forces all pending encodes to complete
@@ -457,6 +477,8 @@ async function renderCanvasToVideoFrameAndEncode({
     // The close() method of the VideoFrame interface clears all states and releases the reference to the media resource.
     frame.close();
 }
+
+
   
 function downloadBlob() {
     console.log("download video");
@@ -474,6 +496,45 @@ function downloadBlob() {
     //hide download button, show user menu
     downloadButton.classList.add("hidden");
     document.getElementById("inputTable").classList.remove("hidden");
+
+}
+
+function startMobileRecording(){
+    
+    var stream = animation.captureStream(fps);
+    var recorder = new MediaRecorder(stream, { 'type': 'video/mp4' });
+    recorder.addEventListener('dataavailable', finishMobileRecording);
+
+    console.log("start simple video recording");
+    console.log("Video dimensions: "+animation.width+", "+animation.height);
+
+    //hide input table and display user message
+    document.getElementById("inputTable").classList.add("hidden");
+    document.getElementById("videoRecordingMessageDiv").innerHTML = 
+    "Video recording underway. A download button will be shown in "+videoDuration+" seconds.<br><br>This feature does not currently work on Mobile -- please try on Desktop instead.";
+    document.getElementById("videoRecordingMessageDiv").classList.remove("hidden");
+    
+    recorder.start(); //moved here
+    capturing = true;
+
+    setTimeout(function() {
+        recorder.stop();
+    }, 1000*videoDuration+200);
+}
+
+function finishMobileRecording(e) {
+    setTimeout(function(){
+        console.log("finish simple video recording");
+        var videoData = [ e.data ];
+        finishedBlob = new Blob(videoData, { 'type': 'video/mp4' });
+        //console.log(finishedBlob);
+        //downloadBlob(finishedBlob);
+        
+        //hide user message, show download button
+        document.getElementById("videoRecordingMessageDiv").classList.add("hidden");
+        downloadButton.classList.remove("hidden");
+
+    },500);
 
 }
   
