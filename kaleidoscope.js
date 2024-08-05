@@ -103,6 +103,7 @@ var fps = 30; //video record frames per second
 
 //MAIN METHOD
 //this runs the default image animation at startup
+userImage = document.getElementById("originalImg");
 canvasWidthInput.value = window.innerWidth;
 canvasHeightInput.value = window.innerHeight;
 getUserInputs();
@@ -184,13 +185,15 @@ function readSourceImage(){
 
 function resizeImage(){
     
-    //remove any existing images
-    while (imageContainer.firstChild) {
-        imageContainer.removeChild(imageContainer.firstChild);
-    }
+    if(isImageLoaded){
+        //remove any existing images
+        while (imageContainer.firstChild) {
+            imageContainer.removeChild(imageContainer.firstChild);
+        }
 
-    while (newImageContainer.firstChild) {
-        newImageContainer.removeChild(newImageContainer.firstChild);
+        while (newImageContainer.firstChild) {
+            newImageContainer.removeChild(newImageContainer.firstChild);
+        }
     }
 
     //image scaling dimensions
