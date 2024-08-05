@@ -19,9 +19,18 @@ var actualHeight = 533;
 var scaledWidth = 400;
 var scaledHeight = 533;
 var widthScalingRatio = 1;
-var maxImageWidth = 500; //could be tweaked for custom output dimensions
 
 var SqrtOf3_4 = Math.sqrt(3)/2;
+
+var canvasWidthInput = document.getElementById("canvasWidthInput");
+canvasWidthInput.addEventListener("change",refresh);
+var canvasHeightInput = document.getElementById("canvasHeightInput");
+canvasHeightInput.addEventListener("change",refresh);
+
+var canvasWidth;
+var canvasHeight;
+var maxImageWidth;
+
 
 //cover loading screen
 var loadingScreen = document.getElementById("coverScreen");
@@ -56,10 +65,10 @@ var videoDurationInput = document.getElementById("videoDurationInput");
 videoDurationInput.addEventListener('change', getUserInputs);
 var videoDuration = Math.max(1,Math.min(120,Number(videoDurationInput.value)));
 
+/*
 //Save and export the new image in png format
 var saveButton = document.getElementById('save-image-button');
 
-/*
 var downloadButton = document.getElementById("downloadButton");
 downloadButton.addEventListener("click",downloadBlob);
 */
@@ -75,13 +84,22 @@ var counter = animationSpeed*0.5; //animation start point
 var fps = 15; //animation frames per second
 var patDim = 400;
 var animationWidth = 800;
+var animationHeight = 800;
 var animationStep = 1.5; //larger values give larger movement between animation frames;
 var animationInterval;
+var playAnimationToggle = false;
 
 //MAIN METHOD
 //this runs the default image animation at startup
+canvasWidthInput.value = window.innerWidth;
+canvasHeightInput.value = window.innerHeight;
 getUserInputs();
 setTimeout(createAnimation, 2000);
+
+function refresh(){
+    getUserInputs();
+    createAnimation();
+}
 
 function getUserInputs(){
     var speedInputValue = Number(animationSpeedInput.value);
@@ -89,6 +107,11 @@ function getUserInputs(){
     console.log("animation speed: "+animationSpeed);
     videoDuration = Math.max(1,Math.min(60,Number(videoDurationInput.value)));
     console.log("video record duration (seconds): "+videoDuration);
+
+    canvasWidth = Number(canvasWidthInput.value);
+    canvasHeight = Number(canvasHeightInput.value);
+    maxImageWidth = canvasWidth/2; //could be tweaked for custom output dimensions
+
 }
 
 //read and accept user input image
@@ -105,6 +128,8 @@ function readSourceImage(){
 
     if(playAnimationToggle == true){
         clearInterval(animationInterval);
+        playAnimationToggle = false;
+        console.log("cancel animation");
     }
 
     loadingScreen.classList.remove("hidden");
@@ -136,7 +161,6 @@ function readSourceImage(){
             }
 
             patDim = scaledWidth;
-            animationWidth = patDim*2;
 
             //resize the src variable of the original image
             var newCanvas = document.createElement('canvas');
@@ -195,13 +219,21 @@ function createAnimation(){
     loadingScreen.classList.remove("lockOn");
 
     getUserInputs();
+    if(playAnimationToggle == true){
+        clearInterval(animationInterval);
+        playAnimationToggle = false;
+        console.log("cancel animation");
+    }
     playAnimationToggle = true;
 
     console.log("create animation");
 
     //load images
+    animationWidth = canvasWidth;
+    animationHeight = canvasHeight;
     animation.width = animationWidth;
-    animation.height = animationWidth;
+    animation.height = animationHeight;
+
     var baseImg = document.getElementById("originalImg");
     var baseRImg = document.getElementById("flippedImg");
     var ctx = animation.getContext("2d", { willReadFrequently: true }); //added willReadFrequently
@@ -301,7 +333,7 @@ function createAnimation(){
     //tile function makes the animation fill up the whole canvas width/height
     var tile = function(){
         var rowData = ctx.getImageData(0,0,patDim*3,patternHeight);
-        for(var i=0; patternHeight*i<animationWidth+SqrtOf3_4*patDim; i++){
+        for(var i=0; patternHeight*i<animationHeight+SqrtOf3_4*patDim; i++){
             for(var j = 0; j*patDim<animationWidth+patDim; j+=3){
             ctx.putImageData(rowData,j*patDim,i*patternHeight);
             }
@@ -323,6 +355,9 @@ function createAnimation(){
 
 }
 
+//HELPER FUNCTIONS BELOW
+//take screenshot of canvas at current position, export as png
+
 //start or stop animation
 function pausePlayAnimation(){
     if(playAnimationToggle == true){
@@ -334,8 +369,7 @@ function pausePlayAnimation(){
     }
 }
 
-//HELPER FUNCTIONS BELOW
-//take screenshot of canvas at current position, export as png
+
 function saveImage(){
     const link = document.createElement('a');
     link.href = animation.toDataURL();
@@ -502,7 +536,6 @@ function startMobileRecording(){
     recordingMessageDiv.classList.remove("hidden");
     
     recorder.start();
-    capturing = true;
 
     setTimeout(function() {
         recorder.stop();
