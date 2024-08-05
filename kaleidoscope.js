@@ -37,10 +37,14 @@ var loadingScreen = document.getElementById("coverScreen");
 //detect user browser
 var ua = navigator.userAgent;
 var isSafari = false;
+var isFirefox = false;
 var isIOS = false;
 var isAndroid = false;
 if(ua.includes("Safari")){
     isSafari = true;
+}
+if(ua.includes("Firefox")){
+    isFirefox = true;
 }
 if(ua.includes("iPhone") || ua.includes("iPad") || ua.includes("iPod")){
     isIOS = true;
@@ -48,7 +52,8 @@ if(ua.includes("iPhone") || ua.includes("iPad") || ua.includes("iPod")){
 if(ua.includes("Android")){
     isAndroid = true;
 }
-console.log("isSafari: "+isSafari+", isIOS: "+isIOS+", isAndroid: "+isAndroid);
+console.log("isSafari: "+isSafari+", isFirefox: "+isFirefox+", isIOS: "+isIOS+", isAndroid: "+isAndroid);
+
 
 //video recording function
 var recordBtn = document.getElementById("recordVideoButton");
@@ -117,7 +122,7 @@ function getUserInputs(){
     maxImageWidth = Math.ceil(canvasWidth/numTiles); //could be tweaked for custom output dimensions
 
     speedInputValue = Number(animationSpeedInput.value);
-    animationSpeed = 8000/speedInputValue * (numTiles/2); //larger value gives slower animation
+    animationSpeed = 8000/speedInputValue * (numTiles/2.5); //larger value gives slower animation
     console.log("animation speed: "+animationSpeed);
     videoDuration = Math.max(1,Math.min(60,Number(videoDurationInput.value)));
     console.log("video record duration (seconds): "+videoDuration);
@@ -440,7 +445,7 @@ document.addEventListener('keydown', function(event) {
 });
 
 function chooseRecordingFunction(){
-    if(isIOS || isAndroid){
+    if(isIOS || isAndroid || isFirefox){
         startMobileRecording();
     }else {
         recordVideoMuxer();
