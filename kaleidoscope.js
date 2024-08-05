@@ -2,7 +2,7 @@
 To do list:
 add embedded ig posts to show example gallery?
 Site logo or Gradient banner at the top?
-Add user input options -- custom height/width of final animation
+Use requestAnimationFrame instead of setInterval?
 */
 
 //image upload variables

@@ -133,6 +133,7 @@ input.input-number-noSpinners {
     padding: 6px;
     text-align: center;
     max-width: 25vw;
+    max-width:80px;    
 }
 
 input.input-number-noSpinners::-webkit-inner-spin-button,
