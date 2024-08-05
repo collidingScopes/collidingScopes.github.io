@@ -2,7 +2,6 @@
 To do list:
 add embedded ig posts to show example gallery?
 Site logo or Gradient banner at the top?
-Use requestAnimationFrame instead of setInterval?
 */
 
 //image upload variables
@@ -23,9 +22,9 @@ var widthScalingRatio = 1;
 var SqrtOf3_4 = Math.sqrt(3)/2;
 
 var canvasWidthInput = document.getElementById("canvasWidthInput");
-canvasWidthInput.addEventListener("change",refresh);
+canvasWidthInput.addEventListener("change",changeTiling);
 var canvasHeightInput = document.getElementById("canvasHeightInput");
-canvasHeightInput.addEventListener("change",refresh);
+canvasHeightInput.addEventListener("change",changeTiling);
 
 var canvasWidth;
 var canvasHeight;
@@ -77,17 +76,25 @@ downloadButton.addEventListener("click",downloadBlob);
 var animationSpeedInput = document.getElementById('speedInput');
 animationSpeedInput.addEventListener('change', getUserInputs);
 
+var userImage;
+
+var numTilesInput = document.getElementById('numTilesInput');
+numTilesInput.addEventListener('change', changeTiling);
+var numTiles;
+
 //animation variables
 var animationLength = 600; //larger value give longer animation before restarting loop
 var animationSpeed = 2000; //larger value gives slower animation
 var counter = animationSpeed*0.5; //animation start point
-var fps = 15; //animation frames per second
 var patDim = 400;
 var animationWidth = 800;
 var animationHeight = 800;
 var animationStep = 1.5; //larger values give larger movement between animation frames;
 var animationInterval;
 var playAnimationToggle = false;
+var animationRequest;
+
+var fps = 30; //video record frames per second
 
 //MAIN METHOD
 //this runs the default image animation at startup
@@ -102,16 +109,26 @@ function refresh(){
 }
 
 function getUserInputs(){
-    var speedInputValue = Number(animationSpeedInput.value);
-    animationSpeed = 8000/speedInputValue; //larger value gives slower animation
+    
+    canvasWidth = Number(canvasWidthInput.value);
+    canvasHeight = Number(canvasHeightInput.value);
+    
+    numTiles = Number(numTilesInput.value);
+    maxImageWidth = Math.ceil(canvasWidth/numTiles); //could be tweaked for custom output dimensions
+
+    speedInputValue = Number(animationSpeedInput.value);
+    animationSpeed = 8000/speedInputValue * (numTiles/2); //larger value gives slower animation
     console.log("animation speed: "+animationSpeed);
     videoDuration = Math.max(1,Math.min(60,Number(videoDurationInput.value)));
     console.log("video record duration (seconds): "+videoDuration);
 
-    canvasWidth = Number(canvasWidthInput.value);
-    canvasHeight = Number(canvasHeightInput.value);
-    maxImageWidth = canvasWidth/2; //could be tweaked for custom output dimensions
+}
 
+function changeTiling(){
+    getUserInputs();
+    resizeImage();
+    animation.scrollIntoView({behavior: "smooth", block: "start"});
+    createAnimation();
 }
 
 //read and accept user input image
@@ -127,7 +144,8 @@ function readSourceImage(){
     }
 
     if(playAnimationToggle == true){
-        clearInterval(animationInterval);
+        //clearInterval(animationInterval);
+        cancelAnimationFrame(animationRequest);
         playAnimationToggle = false;
         console.log("cancel animation");
     }
@@ -136,57 +154,71 @@ function readSourceImage(){
     loadingScreen.classList.add("lockOn");
 
     counter = animationSpeed*0.5; //reset to default animation start point
-        
+
     //read image file      
     var file = imageInput.files[0];
     var reader = new FileReader();
     reader.onload = (event) => {
         var imageData = event.target.result;
-        var image = new Image();
-        image.src = imageData;
-        image.onload = () => {
+        userImage = new Image();
+        userImage.src = imageData;
+        userImage.onload = () => {
           
-            actualWidth = image.width;
-            actualHeight = image.height;
+            actualWidth = userImage.width;
+            actualHeight = userImage.height;
 
-            //image scaling
-            if(actualWidth > maxImageWidth){
-                scaledWidth = maxImageWidth;
-                widthScalingRatio = scaledWidth / actualWidth;
-                scaledHeight = actualHeight * widthScalingRatio;
-            } else{
-                scaledWidth = actualWidth;
-                widthScalingRatio = 1;
-                scaledHeight = actualHeight;
-            }
+            resizeImage();
 
-            patDim = scaledWidth;
-
-            //resize the src variable of the original image
-            var newCanvas = document.createElement('canvas');
-            newCanvas.width = scaledWidth;
-            newCanvas.height = scaledHeight;
-            var ctx = newCanvas.getContext('2d');
-            ctx.drawImage(image, 0, 0, scaledWidth, scaledHeight);
-        
-            var resizedImgSrc = newCanvas.toDataURL();
-    
-            //draw the resized image onto the page
-            var originalImg = document.createElement('img');
-            originalImg.setAttribute("id", "originalImg");
-            originalImg.src = resizedImgSrc;
-            originalImg.width = scaledWidth;
-            originalImg.height = scaledHeight;
-            imageContainer.appendChild(originalImg);
-
-            setTimeout(generateFlippedImage, 1000); //wait a second for image creation before next function
-   
         };
     };
       
     reader.readAsDataURL(file);
     isImageLoaded = true;
     
+}
+
+function resizeImage(){
+    
+    //remove any existing images
+    while (imageContainer.firstChild) {
+        imageContainer.removeChild(imageContainer.firstChild);
+    }
+
+    while (newImageContainer.firstChild) {
+        newImageContainer.removeChild(newImageContainer.firstChild);
+    }
+
+    //image scaling dimensions
+    if(actualWidth > maxImageWidth){
+        scaledWidth = maxImageWidth;
+        widthScalingRatio = scaledWidth / actualWidth;
+        scaledHeight = actualHeight * widthScalingRatio;
+    } else{
+        scaledWidth = actualWidth;
+        widthScalingRatio = 1;
+        scaledHeight = actualHeight;
+    }
+
+    patDim = scaledWidth;
+    //resize the src variable of the original image
+    var newCanvas = document.createElement('canvas');
+    newCanvas.width = scaledWidth;
+    newCanvas.height = scaledHeight;
+    var ctx = newCanvas.getContext('2d');
+    ctx.drawImage(userImage, 0, 0, scaledWidth, scaledHeight);
+
+    var resizedImgSrc = newCanvas.toDataURL();
+
+    //draw the resized image onto the page
+    var originalImg = document.createElement('img');
+    originalImg.setAttribute("id", "originalImg");
+    originalImg.src = resizedImgSrc;
+    originalImg.width = scaledWidth;
+    originalImg.height = scaledHeight;
+    imageContainer.appendChild(originalImg);
+
+    setTimeout(generateFlippedImage, 1000); //wait a second for image creation before next function
+
 }
 
 //flip input image horizontally
@@ -220,7 +252,8 @@ function createAnimation(){
 
     getUserInputs();
     if(playAnimationToggle == true){
-        clearInterval(animationInterval);
+        //clearInterval(animationInterval);
+        cancelAnimationFrame(animationRequest);
         playAnimationToggle = false;
         console.log("cancel animation");
     }
@@ -241,6 +274,7 @@ function createAnimation(){
     var patR = ctx.createPattern(baseRImg, "repeat");
         
     //height of triangle side given side length of 150 is:
+    //patDim = canvasWidth/2;
     var height =  SqrtOf3_4 * patDim;
     var offset = 0;
     ctx.translate(-0.5*patDim, 0);
@@ -341,6 +375,7 @@ function createAnimation(){
     }
 
     //this creates the animation by calling the functions again and again every x miliseconds
+    /*
     animationInterval = setInterval(
     function(){
         if(playAnimationToggle == true){
@@ -352,6 +387,19 @@ function createAnimation(){
         }
 
     } , 1000/fps);
+     */
+
+    function loop(){
+        if(playAnimationToggle == true){
+            fn(false);
+            ctx.translate(animationStep*patDim, height);
+            fn(true);
+            ctx.translate(animationStep*-1*patDim, -height);
+            tile();
+        }
+        animationRequest = requestAnimationFrame(loop);
+    }
+    animationRequest = requestAnimationFrame(loop);
 
 }
 
@@ -362,7 +410,7 @@ function createAnimation(){
 function pausePlayAnimation(){
     if(playAnimationToggle == true){
         playAnimationToggle = false;
-        clearInterval(animationInterval);
+        cancelAnimationFrame(animationRequest);
     } else {
         playAnimationToggle = true;
         createAnimation();
@@ -403,7 +451,9 @@ function chooseRecordingFunction(){
 //source: https://devtails.xyz/adam/how-to-save-html-canvas-to-mp4-using-web-codecs-api
 async function recordVideoMuxer() {
     console.log("start muxer video recording");
-    console.log("Video dimensions: "+animation.width+", "+animation.height);
+    var videoWidth = Math.floor(animation.width/2)*2;
+    var videoHeight = Math.floor(animation.height/8)*8; //force a number which is divisible by 8
+    console.log("Video dimensions: "+videoWidth+", "+videoHeight);
 
     //hide input table and display user message
     document.getElementById("inputTable").classList.add("hidden");
@@ -426,8 +476,8 @@ async function recordVideoMuxer() {
       video: {
         // If you change this, make sure to change the VideoEncoder codec as well
         codec: "avc",
-        width: animation.width,
-        height: animation.height,
+        width: videoWidth,
+        height: videoHeight,
       },
   
       // mp4-muxer docs claim you should always use this with ArrayBufferTarget
@@ -443,8 +493,8 @@ async function recordVideoMuxer() {
     // See https://dmnsgn.github.io/media-codecs for list of codecs and see if your browser supports
     videoEncoder.configure({
       codec: "avc1.42003e",
-      width: animation.width,
-      height: animation.height,
+      width: videoWidth,
+      height: videoHeight,
       bitrate: 7_200_000,
       bitrateMode: "constant",
     });
