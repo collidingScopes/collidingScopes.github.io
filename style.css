@@ -324,10 +324,10 @@ td {
 
 .toggle-controls {
     position: fixed;
-    top: 6px;
-    left: 6px;
+    bottom: 6px;
+    right: 6px;
     z-index: 1500;
-    padding: 10px 20px;
+    padding: 5px 5px;
     background: #5e012d;
     border: none;
     color: white;
