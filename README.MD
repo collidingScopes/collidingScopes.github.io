@@ -3,7 +3,7 @@
 An open source project to turn photos into kaleidoscope animations.
 
 <img src="images/kaleidoscopeExample.png">
-<img src="images/HKAnimation.gif">
+<img src="images/wind.gif">
 
 ## Live Demo
 **Live demo: https://collidingscopes.github.io/**
