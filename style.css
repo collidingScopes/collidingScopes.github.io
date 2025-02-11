@@ -5,7 +5,8 @@ html, body{
     overflow-x: hidden;
     margin: 0;
     padding: 0;
-
+    background-color: #151632;
+    color: white;
 }
 
 #introDiv{
@@ -38,59 +39,79 @@ html, body{
 }
 
 #aboutText{
-    font-size: 32px;
-    font-family: "Permanent Marker", cursive;
+    font-size: 52px;
+    font-family: "Kage Retro";
     font-weight: 400;
     font-style: normal;
     display:block;
     padding: 0;
     margin: 0;
-}
-
-#toolDiv{
-    width:100vw;
+  }
+  
+  #notesDiv{
+    width:98vw;
     box-sizing: border-box;
-    overflow: hidden;
-    background-color: white;
-    text-align: center;
-    justify-content: center;
-}
-
-#notesDiv{
-    width:100vw;
-    box-sizing: border-box;
-    overflow: hidden;
+    /*overflow: hidden;*/
     padding: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-top: 5px solid #581845;
-}
-
-#textBox {
+    /*border-top: 5px solid #581845;*/
+    background-color: #151632;
+    color: white;
+  }
+  
+  #textBox {
     min-width: 350px;
     max-width: 75vw;
-}
+  }
 
-li {
+  a {
+    color: rgb(198, 8, 141);
+  }
+  
+  a:visited {
+    color: rgb(171, 11, 123);
+  }
+  
+  #textBox > ul > li {
     margin-bottom: 6px;
-}
-
-#linksDiv{
+  }
+  
+  #linksDiv{
     background-color: #faebf6;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  
+  .x-link {
+    text-decoration: none;
+  }
+  
+  h2 {
+    font-size: 40px;
+    font-family: Helvetica;
+  }
+  
+#buttonDiv {
+    display: inline block;
+    margin: 0 auto;
+    width: 100vw;
 }
 
-/*
-button, input {
-    font-size: 20px;
-    font-family: Helvetica;
-    margin-top: 10px;
-    margin-bottom: 10px;
+#toolDiv {
+    width: 100vw;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-align: center;
+    justify-content: center;
+    background-color: #151632;
+    color: white;
+    position: relative;
+    min-height: 100vh;
+    padding-bottom: 20px;
 }
-*/
 
 h2 {
     font-size: 40px;
@@ -102,11 +123,11 @@ h2 {
     display: none;
   }
   
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .example {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
+/* Hide scrollbar for IE, Edge and Firefox */
+.example {
+-ms-overflow-style: none;  /* IE and Edge */
+scrollbar-width: none;  /* Firefox */
+}
 
 #animation {
     display: block;
@@ -130,10 +151,11 @@ h2 {
 input.input-number-noSpinners {
     -moz-appearance: textfield;
     border:1px solid rgb(180, 180, 180);
-    padding: 6px;
+    padding: 2px;
     text-align: center;
     max-width: 25vw;
-    max-width:80px;    
+    max-width:80px;
+    margin-bottom: 5px;    
 }
 
 input.input-number-noSpinners::-webkit-inner-spin-button,
@@ -177,11 +199,6 @@ input:hover{
     outline: none;
 }
 
-.hidden {
-    display: none;
-}
-
-
 /* Styling for image upload field */
 input, select {
     cursor: pointer;
@@ -199,7 +216,7 @@ input[type="file"] {
     font-size: 16px;
     font-family: Helvetica;
     display: inline-block;
-    padding: 9px;
+    padding: 6px;
     cursor: pointer;
     margin-left: 3px;
     margin-right: 2px;
@@ -235,6 +252,7 @@ button {
     border: 3px solid #4a2bb0;
     background-color: #4a2bb0;
     color: white;
+    /* margin-bottom: 15px; */
 }
 
 .recordButtonStop{
@@ -271,16 +289,61 @@ td {
     max-width: 150px;
 }
 
-#inputTable{
-    font-size:1em;
+#inputTable {
+    font-size: 1em;
     text-align: center;
     min-width: 280px;
-    width:80vw;
-    max-width: 350px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
+    width: 80vw;
+    max-width: 500px;
+    margin: 0 auto;
+    border-top: none;
+    border-bottom: none;
+    padding: 0;
+    z-index: 500;
+}
+
+#inputTable > td {
+    padding: 0px;
+    margin: 0px;
+}
+
+#stickyTable {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding: 0px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px;
+    margin: 0px;
+    z-index: 500;
+}
+
+.toggle-controls {
+    position: fixed;
+    top: 6px;
+    left: 6px;
+    z-index: 1500;
+    padding: 10px 20px;
+    background: #5e012d;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-size: 2.5em;
+    opacity: 0.9;
+}
+
+  
+.toggle-controls:hover {
+    background: #a3064f;
+}
+
+.hidden {
+    display: none;
 }
 
 /* applies when screen is wide enough */ 
@@ -317,7 +380,7 @@ td {
     display: block;
     visibility: visible;
     position: fixed;
-    z-index: 999;
+    z-index: 2000;
     top: 0px;
     left: 0px;
     width: 100vw;
