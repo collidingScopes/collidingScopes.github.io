@@ -1,4 +1,4 @@
-#Colliding Scopes
+# Colliding Scopes
 
 An open source project to turn photos into kaleidoscope animations.
 

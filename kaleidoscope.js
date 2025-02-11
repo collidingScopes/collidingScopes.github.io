@@ -34,6 +34,22 @@ toggleButton.addEventListener('click', () => {
     console.log("toggle controls");
 });
 
+// Add scroll event listener to handle input table visibility
+window.addEventListener('scroll', () => {
+    const notesDiv = document.getElementById('notesDiv');
+    const inputTable = document.getElementById('inputTable');
+    
+    if (notesDiv && inputTable) {
+        const notesDivRect = notesDiv.getBoundingClientRect();
+        // Hide input table when notesDiv comes into view
+        if (notesDivRect.top <= 100 && notesDivRect.bottom >= 0) {
+            inputTable.classList.add('hidden');
+        } else {
+            inputTable.classList.remove('hidden');
+        }
+    }
+});
+
 //cover loading screen
 var loadingScreen = document.getElementById("coverScreen");
 
