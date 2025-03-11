@@ -440,4 +440,4 @@ userImage = document.getElementById("originalImg");
 canvasWidthInput.value = window.innerWidth;
 canvasHeightInput.value = window.innerHeight;
 getUserInputs();
-setTimeout(createAnimation, 2000);
+setTimeout(createAnimation, 1500);
